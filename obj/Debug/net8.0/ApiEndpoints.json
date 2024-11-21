@@ -27,6 +27,32 @@
   },
   {
     "ContainingType": "WebAPI.Controller.AutorController",
+    "Method": "BuscarAutorPorIdLivro",
+    "RelativePath": "api/Autor/BuscarAutorPorIdLivro/{idLivro}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "idLivro",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "WebAPI.Models.ResponseModel\u00601[[WebAPI.Models.AutorModel, WebAPI, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      }
+    ]
+  },
+  {
+    "ContainingType": "WebAPI.Controller.AutorController",
     "Method": "ListarAutores",
     "RelativePath": "api/Autor/ListarAutores",
     "HttpMethod": "GET",
