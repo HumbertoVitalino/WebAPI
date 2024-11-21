@@ -28,5 +28,12 @@ public class AutorController : ControllerBase
         var autor = await _autorInterface.BuscarAutorPorIdAutor(idAutor);
         return autor;
     }
- 
+
+    [HttpGet("BuscarAutorPorIdLivro/{idLivro}")]
+    public async Task<ActionResult<ResponseModel<AutorModel>>> BuscarAutorPorIdLivro(int idLivro)
+    {
+        var autor = await _autorInterface.BuscarAutorPorIdAutor(idLivro);
+        return autor;
+    }
+
 }
