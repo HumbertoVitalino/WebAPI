@@ -1,11 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using WebAPI.Data;
+using WebAPI.Services.Autor;
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddScoped<IAutorInterface, AutorService>();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
 {
