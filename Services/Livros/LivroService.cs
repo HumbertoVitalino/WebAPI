@@ -39,15 +39,38 @@ public class LivroService : ILivroInterface
         }
     }
 
-    public Task<ResponseModel<List<LivroModel>>> CriarLivro(LivroCriacaoDto livroCriacaoDto)
+    public async Task<ResponseModel<List<LivroModel>>> CriarLivro(LivroCriacaoDto livroCriacaoDto)
     {
         ResponseModel<List<LivroModel>> resposta = new ResponseModel<List<LivroModel>>();
 
-        var livro = new LivroModel()
+        try
         {
-            Titulo = livroCriacaoDto.Titulo,
-            Autor = livroCriacaoDto.Autor
-        };
+            var autor = await _context.Autores.FirstOrDefaultAsync(autorBanco => autorBanco.Id == livroCriacaoDto.Autor.Id);
+
+            if (autor == null)
+            {
+                resposta.Mensagem = "nenhum registro de autor localizado!";
+                return resposta;
+            }
+
+            var livro = new LivroModel()
+            {
+                Titulo = livroCriacaoDto.Titulo,
+                Autor = autor
+            };
+
+            _context.Add(livro);
+            await _context.SaveChangesAsync();
+
+            resposta.Dados = await _context.Livros.Include(a => a.Autor).ToListAsync();
+            return resposta;
+        }
+        catch (Exception ex)
+        {
+            resposta.Mensagem = ex.Message;
+            resposta.Status = false;
+            return resposta;
+        }
     }
     public Task<ResponseModel<List<LivroModel>>> EditarLivro(LivroEdicaoDto livroEdicaoDto)
     {
@@ -79,9 +102,9 @@ public class LivroService : ILivroInterface
         }
     }
 
-    public async Task<ResponseModel<LivroModel>> ListarLivrosPorAutor(int idAutor)
+    public async Task<ResponseModel<List<LivroModel>>> ListarLivrosPorAutor(int idAutor)
     {
-        ResponseModel<LivroModel> resposta = new ResponseModel<LivroModel>();
+        ResponseModel<List<LivroModel>> resposta = new ResponseModel<List<LivroModel>>();
 
         try
         {
@@ -92,11 +115,11 @@ public class LivroService : ILivroInterface
 
             if (livro == null)
             {
-                resposta.Mensagem = "Nenhum autor localizado!";
+                resposta.Mensagem = "Nenhum livro localizado!";
                 return resposta;
             }
 
-            resposta.Dados = livro.Autor;
+            resposta.Dados = livro;
             resposta.Mensagem = "Autor localizado";
             return resposta;
         }
@@ -105,6 +128,6 @@ public class LivroService : ILivroInterface
             resposta.Mensagem = ex.Message;
             resposta.Status = false;
             return resposta;
-        }
+        } 
     }
 }
