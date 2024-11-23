@@ -19,7 +19,9 @@ public class LivroService : ILivroInterface
         ResponseModel<LivroModel> resposta = new ResponseModel<LivroModel>();
         try
         {
-            var livro = await _context.Livros.FirstOrDefaultAsync(livros => livros.Id == idLivro);
+            var livro = await _context.Livros
+                .Include(a => a.Autor)
+                .FirstOrDefaultAsync(livros => livros.Id == idLivro);
 
             if (livro == null)
             {
@@ -72,14 +74,76 @@ public class LivroService : ILivroInterface
             return resposta;
         }
     }
-    public Task<ResponseModel<List<LivroModel>>> EditarLivro(LivroEdicaoDto livroEdicaoDto)
+    public async Task<ResponseModel<List<LivroModel>>> EditarLivro(LivroEdicaoDto livroEdicaoDto)
     {
-        throw new NotImplementedException();
+        ResponseModel<List<LivroModel>> resposta = new ResponseModel<List<LivroModel>>();
+
+        try
+        {
+            var livro = await _context.Livros
+                .Include(a => a.Autor)
+                .FirstOrDefaultAsync(l => l.Id == livroEdicaoDto.Autor.Id);
+
+            var autor = await _context.Autores.FirstOrDefaultAsync(a => a.Id == livroEdicaoDto.Autor.Id);
+
+            if (autor == null)
+            {
+                resposta.Mensagem = "Não foi possivel encontrar o autor";
+                return resposta;
+            }
+
+            if (livro == null)
+            {
+                resposta.Mensagem = "Não foi possivel encontrar o livro";
+                return resposta;
+            }
+
+            livro.Titulo = livroEdicaoDto.Titulo;
+            livro.Autor = autor;
+
+            _context.Update(livro);
+            await _context.SaveChangesAsync();
+
+            resposta.Dados = await _context.Livros.ToListAsync();
+            return resposta;
+
+        }
+        catch (Exception ex)
+        {
+            resposta.Mensagem = ex.Message;
+            resposta.Status = false;
+            return resposta;
+        }
+
     }
 
-    public Task<ResponseModel<List<LivroModel>>> ExcluirLivro(int idLivro)
+    public async Task<ResponseModel<List<LivroModel>>> ExcluirLivro(int idLivro)
     {
-        throw new NotImplementedException();
+        ResponseModel<List<LivroModel>> resposta = new ResponseModel<List<LivroModel>>();
+
+        try
+        {
+            var livros = await _context.Livros.FirstOrDefaultAsync(l => l.Id == idLivro);
+
+            if (livros == null)
+            {
+                resposta.Mensagem = "Não foi possivel encontrar o livro";
+                return resposta;
+            }
+
+            _context.Remove(livros);
+            await _context.SaveChangesAsync();
+
+            resposta.Dados = await _context.Livros.ToListAsync();
+            return resposta;
+
+        }
+        catch (Exception ex)
+        {
+            resposta.Mensagem = ex.Message;
+            resposta.Status = false;
+            return resposta;
+        }
     }
 
     public async Task<ResponseModel<List<LivroModel>>> ListarLivros()
@@ -87,7 +151,9 @@ public class LivroService : ILivroInterface
         ResponseModel<List<LivroModel>> resposta = new ResponseModel<List<LivroModel>>();
         try
         {
-            var livros = await _context.Livros.ToListAsync();
+            var livros = await _context.Livros
+                .Include(a => a.Autor)
+                .ToListAsync();
             resposta.Dados = livros;
             resposta.Mensagem = "realizado com sucesso";
 
