@@ -82,7 +82,7 @@ public class LivroService : ILivroInterface
         {
             var livro = await _context.Livros
                 .Include(a => a.Autor)
-                .FirstOrDefaultAsync(l => l.Id == livroEdicaoDto.Autor.Id);
+                .FirstOrDefaultAsync(l => l.Id == livroEdicaoDto.Id);
 
             var autor = await _context.Autores.FirstOrDefaultAsync(a => a.Id == livroEdicaoDto.Autor.Id);
 
